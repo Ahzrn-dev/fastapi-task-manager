@@ -1,17 +1,21 @@
 from fastapi import FastAPI
 
-from app.routers import router
+from app.api.tasks import router as task_router
+from app.core.database import Base, engine
 
 app = FastAPI(
     title="Task Manager API",
-    description="A RESTful Task Management API built with FastAPI",
-    version="1.0.0"
+    version="1.0.0",
 )
+
+Base.metadata.create_all(bind=engine)
+
+app.include_router(task_router)
 
 
 @app.get("/")
-def root():
-    return {"message": "Welcome to Task Manager API"}
-
-
-app.include_router(router)
+def health_check():
+    return {
+        "status": "ok",
+        "message": "Task Manager API is running",
+    }
